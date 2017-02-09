@@ -7,5 +7,4 @@ setup(name='cg',
       author_email='artem.zholus@gmail.com',
       url='https://github.com/CT-18/cg_common',
       requires=['numpy'],
-      install_requires=['numpy'],
       packages=['cg'])
