@@ -1,10 +1,11 @@
-import numpy as np
-import numpy.ma as ma
-from itertools import tee
 from functools import cmp_to_key
 from unittest import TestCase
-from utils import is_sorted, get_fall_pos
-from point import Point, vol, turn, HomogeneousPoint
+
+import numpy as np
+import numpy.ma as ma
+
+from cg.point import Point, turn
+from test.utils import is_sorted, get_fall_pos
 
 
 class PointTestGenerator:
@@ -31,6 +32,7 @@ class PointTestGenerator:
     def generateUniform():
         return PointTestGenerator.generate(np.random.uniform, low=PointTestGenerator.uniformRandomLower,
                                            high=PointTestGenerator.uniformRandomUpper)
+
 
 class PointTest(TestCase):
     def test_add_eq(self):
@@ -91,6 +93,7 @@ class PointTest(TestCase):
 
     def tearDown(self):
         print('...passed %d tests...' % PointTestGenerator.cumulativeTestCount)
+
 
 class HomogeneousPointTest(TestCase):
     def test_empty(self):

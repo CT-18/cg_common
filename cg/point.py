@@ -1,9 +1,10 @@
 import numpy as np
 from functools import total_ordering, reduce
 from numpy.linalg import det
-from utils import gcd, reduce_fraction
+from .utils import gcd, reduce_fraction
 from fractions import Fraction
 from operator import mul, attrgetter, methodcaller
+
 
 @total_ordering
 class Point:
@@ -11,6 +12,7 @@ class Point:
     Класс задает точку в афинном пространстве.
     Определены арифметические операции и лексикографическое сравнение.
     """
+
     def __init__(self, x, *args):
         """
         Конструктор n-мерной точки.
@@ -94,8 +96,10 @@ class Point:
     def __repr__(self):
         return str(self)
 
+
 def vol(point: Point, *hyperplane):
     return det(np.array([pt.coord for pt in hyperplane]) - point.coord)
+
 
 def turn(point: Point, *hyperplane):
     return np.sign(vol(point, *hyperplane))
@@ -106,6 +110,7 @@ class HomogeneousPoint:
     """
     Класс определяет точку в однородных координатах.
     """
+
     def __init__(self, x, *args):
         """
         Конструктор n-мерной точки в однородных координатах.
