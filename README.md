@@ -2,3 +2,8 @@
 common classes in computational geometry notebooks
 
 [![Build Status](https://travis-ci.org/CT-18/cg_common.svg?branch=master)](https://travis-ci.org/CT-18/cg_common.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/CT-18/cg_common/badge.svg?branch=master)](https://coveralls.io/github/CT-18/cg_common?branch=master)
+
+## How to install
+    $ pip install -r requirements.txt
+    $ python setup.py install
