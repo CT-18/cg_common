@@ -1,9 +1,7 @@
 import numpy as np
 from functools import total_ordering, reduce
 from numpy.linalg import det
-from cg.utils import gcd, reduce_fraction
-from fractions import Fraction
-from operator import mul, attrgetter, methodcaller
+from cg.utils import gcd
 
 
 @total_ordering
@@ -41,7 +39,7 @@ class Point:
         """
         проецирует точки на одну и ту же гиперплоскость (не обязательно на единичной высоте)
 
-        :param other: экземпляр HomogeneousPoint
+        :param other: экземпляр Point
         :return: пара из координат точек на одной гиперплоскости
         """
         m = gcd(self.coord[-1], other.coord[-1])
@@ -53,7 +51,7 @@ class Point:
         """
         сумма точек.
 
-        :param other: экщемпляр HomogeneousPoint
+        :param other: экщемпляр Point
         :return: сумма точек в однородных координатах
         """
         new_self, new_other = self.same_level(other)
@@ -65,7 +63,7 @@ class Point:
         """
         разность точек.
 
-        :param other: экщемпляр HomogeneousPoint
+        :param other: экщемпляр Point
         :return: разность точек в однородных координатах
         """
         new_self, new_other = self.same_level(other)
@@ -92,28 +90,38 @@ class Point:
         res.coord[-1] //= other
         return res
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: int):
         return other * self
 
     def __eq__(self, other):
         """
         проверяет две точки в однородных координатах на равенство
 
-        :param other: экземпляр HomogeneousPoint
+        :param other: экземпляр Point
         :return:
         """
         return np.all(self.coord * other.coord[-1] == other.coord * self.coord[-1])
 
     def __lt__(self, other):
         """
+        Лексикографическое "меньше" для однородных точек
 
-        :param other:
+        :param other: экземпляр Point
         :return:
         """
         slf, otr = self.same_level(other)
         differs, = np.where(slf != otr)
         less = (slf < otr)[differs]
         return len(less) != 0 and less[0]
+
+    def __getitem__(self, item):
+        """
+        getter для координат точек
+
+        :param item: индекс
+        :return: координата по оси item
+        """
+        return self.coord[item]
 
     def __str__(self):
         return '({0})'.format('; '.join(map(str, self.coord)))
