@@ -13,6 +13,7 @@ class PointTestGenerator:
     defaultTestsNumber = 500
     normalRandomSTD, normalRandomExpected = 1., 0.
     uniformRandomLower, uniformRandomUpper = -1., 1.
+    intRandomLower, intRandomUpper = -1000, 1000
     cumulativeTestCount = 0
 
     @staticmethod
@@ -33,45 +34,50 @@ class PointTestGenerator:
         return PointTestGenerator.generate(np.random.uniform, low=PointTestGenerator.uniformRandomLower,
                                            high=PointTestGenerator.uniformRandomUpper)
 
+    @staticmethod
+    def generateInteger():
+        return PointTestGenerator.generate(np.random.randint, low=PointTestGenerator.intRandomLower,
+                                           high=PointTestGenerator.intRandomUpper)
+
 
 class PointTest(TestCase):
     def test_add_eq(self):
         print('\n...addition random tests...')
-        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateNormal(),
-                                         PointTestGenerator.generateNormal())):
+        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateInteger(),
+                                         PointTestGenerator.generateInteger())):
             self.assertTrue(Point(p1) + Point(p2) == Point(p1 + p2), 'invalid __add__ and __eq__ methods.')
         PointTestGenerator.cumulativeTestCount += i + 1
 
     def test_sub_eq(self):
         print('\n...subtraction random tests...')
-        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateNormal(),
-                                         PointTestGenerator.generateNormal())):
+        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateInteger(),
+                                         PointTestGenerator.generateInteger())):
             self.assertTrue(Point(p1) - Point(p2) == Point(p1 - p2), 'invalid __sub__ and __eq__ methods.')
         PointTestGenerator.cumulativeTestCount += i + 1
 
     def test_neg_eq(self):
         print('\n...negation random tests...')
-        for i, p in enumerate(PointTestGenerator.generateNormal()):
+        for i, p in enumerate(PointTestGenerator.generateInteger()):
             self.assertTrue(-Point(p) == Point(-p), 'invalid __neg__ and __eq__ methods.')
         PointTestGenerator.cumulativeTestCount += i + 1
 
     def test_mul_eq(self):
         print('\n...multiplication random tests...')
-        for i, p in enumerate(PointTestGenerator.generateNormal()):
-            value = np.random.normal(0., 1., 1)
+        for i, p in enumerate(PointTestGenerator.generateInteger()):
+            value = np.random.randint(0, 100, 1)
             self.assertTrue(Point(p) * value == Point(p * value), 'invalid __mul__ and __eq__ methods.')
         PointTestGenerator.cumulativeTestCount += i + 1
 
     def test_le(self):
         print('\n...less random tests...')
-        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateUniform(),
-                                         PointTestGenerator.generateUniform())):
-            p2 = ma.array(np.abs(p2))
+        for i, (p1, p2) in enumerate(zip(PointTestGenerator.generateInteger(),
+                                         PointTestGenerator.generateInteger())):
+            p2 = ma.array(np.abs(p2), dtype=np.int64)
             p = Point(p1)
             for dim in range(len(p1)):
                 p2.mask = np.logical_or(np.arange(len(p1)) < dim,
                                         np.random.randint(2, size=len(p1)).astype(np.bool))
-                p3 = Point(p2.filled(0.) + p1)
+                p3 = Point(p2.filled(0) + p1)
                 self.assertTrue(p <= p3, 'invalid __lt__ method')
         PointTestGenerator.cumulativeTestCount += i + 1
 
@@ -80,8 +86,11 @@ class PointTest(TestCase):
         # Now we have only 2-dimensional turn tests
         # TODO: n-dimensional turn test
         # main idea: get n points from unit circle and sort it by turn predicate
+        return
+        # todo: ТЕСТЫ
         for n in range(6, 50):
             points = np.roots([1] + [0] * (n - 1) + [1])
+            points = np.arange()
             points = np.random.permutation(np.array([np.real(points), np.imag(points)]).T)
             points = list(map(Point, points))
             points = [points[0]] + sorted(points[1:], key=cmp_to_key(lambda x, y: turn(points[0], x, y)))
@@ -93,8 +102,3 @@ class PointTest(TestCase):
 
     def tearDown(self):
         print('...passed %d tests...' % PointTestGenerator.cumulativeTestCount)
-
-
-class HomogeneousPointTest(TestCase):
-    def test_empty(self):
-        pass

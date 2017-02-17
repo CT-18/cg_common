@@ -1,1 +1,1 @@
-from .point_test import PointTest, HomogeneousPointTest
+from test.point_test import PointTest

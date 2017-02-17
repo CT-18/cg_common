@@ -1,1 +1,1 @@
-from .point import Point, HomogeneousPoint, turn
+from .point import Point, Point, turn
