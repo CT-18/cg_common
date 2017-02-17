@@ -1,2 +1,7 @@
 *.pyc
 .idea/*
+
+# Tests and installation
+*.egg-info
+.coverage
+htmlcov

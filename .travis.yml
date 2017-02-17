@@ -5,8 +5,11 @@ sudo: false
 
 install:
   - pip3 install -r requirements.txt
-  - python3 setup.py install
+  - pip3 install coveralls
 
 script:
-  - python3 -m unittest test.PointTest
+  - coverage run --source cg setup.py test
+
+after_success:
+  coveralls
 
