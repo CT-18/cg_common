@@ -51,7 +51,7 @@ class Point:
         """
         сумма точек.
 
-        :param other: экщемпляр Point
+        :param other: экземпляр Point
         :return: сумма точек в однородных координатах
         """
         new_self, new_other = self.same_level(other)
@@ -63,7 +63,7 @@ class Point:
         """
         разность точек.
 
-        :param other: экщемпляр Point
+        :param other: экземпляр Point
         :return: разность точек в однородных координатах
         """
         new_self, new_other = self.same_level(other)
