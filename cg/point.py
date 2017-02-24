@@ -126,6 +126,14 @@ class Point:
     def __str__(self):
         return '({0})'.format('; '.join(map(str, self.coord)))
 
+    def __repr__(self):
+        suffix = ''
+        coord = self.coord[:-1].tolist()
+        if self.coord[-1] != 1:
+            suffix = ', homogeneous=True'
+            coord.append(self.coord[-1])
+        return 'Point({0}{1})'.format(', '.join(map(str, coord)), suffix)
+
     def is_finite(self):
         return self.coord[-1] != 0
 
@@ -136,9 +144,3 @@ def vol(point: Point, *hyperplane):
 
 def turn(point: Point, *hyperplane):
     return np.sign(vol(point, *hyperplane))
-
-
-if __name__ == '__main__':
-    p = Point(1, 1)
-    q = Point(0, 2)
-    print(p - q)

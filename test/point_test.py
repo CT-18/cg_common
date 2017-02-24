@@ -6,38 +6,7 @@ import numpy.ma as ma
 
 from cg.point import Point, turn
 from test.utils import is_sorted, get_fall_pos
-
-
-class PointTestGenerator:
-    dimensions = 10
-    defaultTestsNumber = 500
-    normalRandomSTD, normalRandomExpected = 1., 0.
-    uniformRandomLower, uniformRandomUpper = -1., 1.
-    intRandomLower, intRandomUpper = -1000, 1000
-    cumulativeTestCount = 0
-
-    @staticmethod
-    def generate(generator, **kwargs):
-        for dim in range(2, PointTestGenerator.dimensions + 1):
-            points = generator(size=dim * PointTestGenerator.defaultTestsNumber, **kwargs) \
-                .reshape((PointTestGenerator.defaultTestsNumber, dim))
-            for point in points:
-                yield point
-
-    @staticmethod
-    def generateNormal():
-        return PointTestGenerator.generate(np.random.normal, loc=PointTestGenerator.normalRandomExpected,
-                                           scale=PointTestGenerator.normalRandomSTD)
-
-    @staticmethod
-    def generateUniform():
-        return PointTestGenerator.generate(np.random.uniform, low=PointTestGenerator.uniformRandomLower,
-                                           high=PointTestGenerator.uniformRandomUpper)
-
-    @staticmethod
-    def generateInteger():
-        return PointTestGenerator.generate(np.random.randint, low=PointTestGenerator.intRandomLower,
-                                           high=PointTestGenerator.intRandomUpper)
+from cg.utils import PointTestGenerator
 
 
 class PointTest(TestCase):

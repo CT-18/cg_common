@@ -1,1 +1,1 @@
-from test.point_test import PointTest
+from point_test import PointTest
