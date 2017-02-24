@@ -1,18 +1,27 @@
 import numpy as np
 
-def gcd(a: int, b: int):
+
+def gcd(a: int, b: int) -> int:
     while b:
         a, b = b, a % b
     return a
 
 
-def lcm(a: int, b: int):
+def lcm(a: int, b: int) -> int:
     return (a * b) // gcd(a, b)
 
 
-def reduce_fraction(a: int, b: int):
+def reduce_fraction(a: int, b: int) -> (int, int):
     d = gcd(a, b)
     return a // d, b // d
+
+
+def cmp_(x, y) -> int:
+    if x == y:
+        return 0
+    if x > y:
+        return 1
+    return -1
 
 
 class PointTestGenerator:
