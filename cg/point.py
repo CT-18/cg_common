@@ -137,6 +137,9 @@ class Point:
             coord.append(self.coord[-1])
         return 'Point({0}{1})'.format(', '.join(map(str, coord)), suffix)
 
+    def __hash__(self):
+        return hash(str(self))
+
     def is_finite(self):
         """
         предикат который возвращает True тогда и только тогда когда
