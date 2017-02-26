@@ -138,7 +138,7 @@ class Point:
         return 'Point({0}{1})'.format(', '.join(map(str, coord)), suffix)
 
     def __hash__(self):
-        return hash(str(self))
+        return hash(tuple(self.coord))
 
     def is_finite(self):
         """
