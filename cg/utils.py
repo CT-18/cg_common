@@ -26,11 +26,12 @@ def int_det(A: np.ndarray) -> int:
     :param A: квадратная матрица
     :return: определитель A
     """
+    mult = 1
     for i in range(len(A) - 1):
         for j in range(i + 1, len(A)):
-            d = gcd(A[i][i], A[j][i])
-            A[j] = A[j] * (A[i][i] // d) - A[i] * (A[j][i] // d)
-    return A.diagonal().prod()
+            A[j] = A[j] * A[i][i] - A[i] * A[j][i]
+            mult *= A[i][i]
+    return int(A.diagonal().prod()) // mult
 
 
 def cmp_(x, y) -> int:

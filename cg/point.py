@@ -36,18 +36,6 @@ class Point:
         else:
             raise Exception('unable to create HomogeneousPoint')
 
-    def same_level(self, other) -> (np.ndarray, np.ndarray):
-        """
-        проецирует точки на одну и ту же гиперплоскость (не обязательно на единичной высоте)
-
-        :param other: экземпляр Point
-        :return: (np.ndarray, np.ndarray) пара из координат точек на одной гиперплоскости
-        """
-        m = gcd(self.coord[-1], other.coord[-1])
-        self_height = other.coord[-1] // m
-        other_height = self.coord[-1] // m
-        return self.coord * self_height, other.coord * other_height
-
     def __add__(self, other) -> 'Point':
         """
         сумма точек.
@@ -126,10 +114,10 @@ class Point:
         """
         return self.coord[item]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '({0})'.format('; '.join(map(str, self.coord)))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         suffix = ''
         coord = self.coord[:-1].tolist()
         if self.coord[-1] != 1:
@@ -137,7 +125,12 @@ class Point:
             coord.append(self.coord[-1])
         return 'Point({0}{1})'.format(', '.join(map(str, coord)), suffix)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
+        """
+        хэш точки
+
+        :return: int хэш
+        """
         return hash(tuple(self.coord))
 
     def is_finite(self):
@@ -156,6 +149,18 @@ class Point:
         :return: int
         """
         return len(self.coord) - 1
+
+    def same_level(self, other) -> (np.ndarray, np.ndarray):
+        """
+        проецирует точки на одну и ту же гиперплоскость (не обязательно на единичной высоте)
+
+        :param other: экземпляр Point
+        :return: (np.ndarray, np.ndarray) пара из координат точек на одной гиперплоскости
+        """
+        m = gcd(self.coord[-1], other.coord[-1])
+        self_height = other.coord[-1] // m
+        other_height = self.coord[-1] // m
+        return self.coord * self_height, other.coord * other_height
 
 
 def vol(point: Point, *hyperplane):
@@ -214,73 +219,6 @@ class PointSet:
                 raise StopIteration
             yield Point(self.points[__i], homogeneous=True)
 
-    def __apply(self, func, axis):
-        return np.apply_along_axis(func, axis, self.points[:self.size])
-
-    def __apply_all(self, func, axis):
-        return np.apply_along_axis(func, axis, self.points)
-
-    def append(self, point: Point):
-        """
-        добавляет точку в конец массива содержащего множество
-
-        :param point: точка
-        :return: None
-        """
-        if point.dim() != self.dim():
-            raise Exception('incorrect dimension')
-        if self.size == 0:
-            self.points = np.append(self.points, point.coord.reshape((1, -1)), axis=0)
-        elif self.size == len(self.points):
-            new = np.zeros((len(self.points) * 2, self.dim() + 1), dtype=self.points.dtype)
-            new[:len(self.points)] = self.points
-            self.points = new
-        self.points[self.size] = point.coord
-        self.size += 1
-
-    def pop(self) -> Point:
-        """
-        удаляет последний элемент множества
-
-        :return: Point последний элемент
-        """
-        if self.size == 0:
-            raise Exception('Set is empty')
-        last = Point(self.points[self.size - 1], homogeneous=True)
-        self.size -= 1
-        if self.size == 0:
-            self.points = np.array([], dtype=np.int32).reshape((-1, self.dim() + 1))
-        else:
-            self.points[self.size] = np.zeros(self.dim() + 1, dtype=np.int32)
-        if self.size * 2 == len(self.points):
-            self.points = self.points[:self.size]
-        return last
-
-    def insert(self, index: int, point: Point):
-        """
-        вставляет точку на позицию index
-
-        :param index: позиция для вставки (int)
-        :param point: точка (Point)
-        :return: None
-        """
-        self.append(point)
-        self.points[index + 1:self.size] = self.points[index:self.size - 1]
-        self.points[index] = point.coord
-        pass
-
-    def delete(self, index) -> Point:
-        """
-        удаляет точку по индексу
-
-        :param index: int позиция удаления
-        :return: Point удаленная точка
-        """
-        deleted = self.points[index]
-        self.points[index:self.size - 1] = self.points[index + 1:self.size]
-        self.pop()
-        return deleted
-
     def __getitem__(self, item: int) -> Point:
         """
         геттер для точек в множестве.
@@ -306,14 +244,6 @@ class PointSet:
             raise Exception('incorrect point')
         self.points[item] = point.coord
 
-    def dim(self) -> int:
-        """
-        размерность простравства, которому принадлежат точки
-
-        :return: int
-        """
-        return self.points.shape[-1] - 1
-
     def __len__(self):
         """
         количество точек в множестве
@@ -321,6 +251,31 @@ class PointSet:
         :return: int
         """
         return self.size
+
+    def __str__(self):
+        """
+        строковое представление множества
+
+        :return: таблица координат
+        """
+        return str(self.points)
+
+    def __repr__(self):
+        return 'PointSet(\n\t{0}\n)'.format(', \n\t'.join(map(lambda x: repr(Point(x, homogeneous=True)), self.points)))
+
+    def __apply(self, func, axis):
+        return np.apply_along_axis(func, axis, self.points[:self.size])
+
+    def __apply_all(self, func, axis):
+        return np.apply_along_axis(func, axis, self.points)
+
+    def dim(self) -> int:
+        """
+        размерность простравства, которому принадлежат точки
+
+        :return: int
+        """
+        return self.points.shape[-1] - 1
 
     def map(self, func: Callable[..., int]):
         """
@@ -415,8 +370,109 @@ class PointSet:
         if cmp is not None:
             cmp_ = cmp
         points = self.map(lambda x: Point(x, homogeneous=True)).tolist()
-        points = [point.coord for point in sorted(points, key=cmp_to_key(cmp_))]
+        srt = sorted(points, key=cmp_to_key(cmp_))
+        points = [point.coord for point in srt]
         if inplace:
             self.points = np.array(points, dtype=np.int32)
         else:
             return PointSet(points)
+
+
+class Polyline2D(PointSet):
+    """
+    Класс полилинии.
+    """
+    def __init__(self, initial, cmp=None):
+        if isinstance(initial, np.ndarray):
+            assert initial.shape[-1] == 3
+        if isinstance(initial, list):
+            assert all(map(lambda x: x.dim() == 2, initial))
+        if isinstance(initial, int):
+            assert initial == 2
+        super().__init__(initial)
+        if len(self) < 4:
+            return
+        if cmp is not None:
+            self.default_comparator = cmp
+        else:
+            self.default_comparator = lambda x, y: -turn(self[0], x, y)
+        new = sorted(map(lambda x: Point(x, homogeneous=True), self.points[1:]),
+                     key=cmp_to_key(self.default_comparator))
+        self.points = [point.coord for point in new]
+
+    def sort(self, cmp:  Callable[[Point, Point], int]=None, inplace=True):
+        compare = self.default_comparator
+        if cmp is not None:
+            compare = cmp
+        new = super().sort(self.default_comparator, inplace)
+        if not inplace:
+            return Polyline2D(new.coord, cmp=compare)
+
+
+class DynamicPointSet(PointSet):
+    """
+    Динамическое множество точек.
+    """
+    def __init__(self, initial):
+        super().__init__(initial)
+
+    def append(self, point: Point):
+        """
+        добавляет точку в конец массива содержащего множество
+
+        :param point: точка
+        :return: None
+        """
+        if point.dim() != self.dim():
+            raise Exception('incorrect dimension')
+        if self.size == 0:
+            self.points = np.append(self.points, point.coord.reshape((1, -1)), axis=0)
+        elif self.size == len(self.points):
+            new = np.zeros((len(self.points) * 2, self.dim() + 1), dtype=self.points.dtype)
+            new[:len(self.points)] = self.points
+            self.points = new
+        self.points[self.size] = point.coord
+        self.size += 1
+
+    def pop(self) -> Point:
+        """
+        удаляет последний элемент множества
+
+        :return: Point последний элемент
+        """
+        if self.size == 0:
+            raise Exception('Set is empty')
+        last = Point(self.points[self.size - 1], homogeneous=True)
+        self.size -= 1
+        if self.size == 0:
+            self.points = np.array([], dtype=np.int32).reshape((-1, self.dim() + 1))
+        else:
+            self.points[self.size] = np.zeros(self.dim() + 1, dtype=np.int32)
+        if self.size * 2 == len(self.points):
+            self.points = self.points[:self.size]
+        return last
+
+    def insert(self, index: int, point: Point):
+        """
+        вставляет точку на позицию index
+
+        :param index: позиция для вставки (int)
+        :param point: точка (Point)
+        :return: None
+        """
+        self.append(point)
+        self.points[index + 1:self.size] = self.points[index:self.size - 1]
+        self.points[index] = point.coord
+        pass
+
+    def delete(self, index) -> Point:
+        """
+        удаляет точку по индексу
+
+        :param index: int позиция удаления
+        :return: Point удаленная точка
+        """
+        deleted = self.points[index]
+        self.points[index:self.size - 1] = self.points[index + 1:self.size]
+        self.pop()
+        return deleted
