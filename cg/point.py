@@ -1,8 +1,8 @@
 import numpy as np
 from functools import total_ordering, reduce, cmp_to_key
-from numpy.linalg import det
-from cg.utils import gcd, cmp_ as compare
+from cg.utils import gcd, cmp_ as compare, int_det as det
 from typing import Callable
+from operator import itemgetter
 
 
 @total_ordering
@@ -401,7 +401,7 @@ class PointSet:
     def sort(self, cmp: Callable[[Point, Point], int]=None, inplace=True) -> Point:
         """
         сортирует точки множества по указанному компаратору.
-        Если компаратор не задан используется лексикографическое '<'.
+        Если компаратор не задан используется лексикографическое сравнение.
 
         :param inplace: bool если True то сохраняет отсортированный список
             точек в том же множестве

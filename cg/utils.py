@@ -1,7 +1,10 @@
+from functools import reduce
 import numpy as np
 
 
 def gcd(a: int, b: int) -> int:
+    if a == 0 or b == 0:
+        return 1
     while b:
         a, b = b, a % b
     return a
@@ -14,6 +17,20 @@ def lcm(a: int, b: int) -> int:
 def reduce_fraction(a: int, b: int) -> (int, int):
     d = gcd(a, b)
     return a // d, b // d
+
+
+def int_det(A: np.ndarray) -> int:
+    """
+    целочисленный детерминант матрицы A
+
+    :param A: квадратная матрица
+    :return: определитель A
+    """
+    for i in range(len(A) - 1):
+        for j in range(i + 1, len(A)):
+            d = gcd(A[i][i], A[j][i])
+            A[j] = A[j] * (A[i][i] // d) - A[i] * (A[j][i] // d)
+    return A.diagonal().prod()
 
 
 def cmp_(x, y) -> int:
