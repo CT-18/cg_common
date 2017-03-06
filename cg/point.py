@@ -1,7 +1,8 @@
 import numpy as np
 from functools import total_ordering, reduce, cmp_to_key
-from cg.utils import gcd, cmp_ as compare, int_det as det
+from cg.utils import gcd, cmp_ as compare, int_det as det, PointTestGenerator
 from typing import Callable
+from types import GeneratorType
 from operator import itemgetter
 
 
@@ -204,6 +205,14 @@ class PointSet:
             else:
                 raise Exception('wrong argument')
             self.size = len(self.points)
+        elif isinstance(initial, GeneratorType):
+            points = []
+            for point in initial:
+                if isinstance(point, np.ndarray):
+                    points.append(Point(point))
+                else:
+                    points.append(point)
+            PointSet.__init__(self, points)
         else:
             raise Exception('wrong argument')
 
@@ -227,6 +236,21 @@ class PointSet:
         :param item: int - индекс
         :return: Point точка по номеру
         """
+        if isinstance(item, slice):
+            stop = item.stop
+            start = item.start
+            step = item.step
+            if stop is None:
+                stop = len(self)
+            if step is None:
+                step = 1
+            if start is None:
+                start = 0
+            if start < 0:
+                start += len(self)
+            if stop < 0:
+                stop += len(self)
+            return PointSet(self.points[start:stop:step])
         if item >= self.size:
             raise IndexError
         return Point(self.points[item], homogeneous=True)

@@ -31,6 +31,8 @@ def int_det(A: np.ndarray) -> int:
         for j in range(i + 1, len(A)):
             A[j] = A[j] * A[i][i] - A[i] * A[j][i]
             mult *= A[i][i]
+    if mult == 0:
+        mult = 1
     return int(A.diagonal().prod()) // mult
 
 
