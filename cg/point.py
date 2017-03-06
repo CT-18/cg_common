@@ -195,13 +195,13 @@ class PointSet:
             self.size = 0
         elif isinstance(initial, np.ndarray):
             assert len(initial.shape) == 2 and (initial.dtype == np.int32 or initial.dtype == np.int64)
-            self.points = np.array(initial, dtype=np.int32)
+            self.points = np.array(initial, dtype=np.int64)
             self.size = len(initial)
         elif isinstance(initial, list):
             if all(map(lambda x: isinstance(x, Point) and x.dim() == initial[0].dim(), initial)):
-                self.points = np.array([point.coord for point in initial], dtype=np.int32)
+                self.points = np.array([point.coord for point in initial], dtype=np.int64)
             elif all(map(lambda x: isinstance(x, np.ndarray) and x.shape == initial[0].shape, initial)):
-                self.points = np.array(initial, dtype=np.int32)
+                self.points = np.array(initial, dtype=np.int64)
             else:
                 raise Exception('wrong argument')
             self.size = len(self.points)
