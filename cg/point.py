@@ -176,6 +176,11 @@ class Point:
         return self.coord * self_height, other.coord * other_height
 
 
+def dist2(p: Point, q: Point):
+    coord__sum = np.square((p - q).coord[:-1]).sum()
+    return coord__sum
+
+
 def vol(point: Point, *hyperplane):
     return det(np.array([pt.coord for pt in hyperplane] + [point.coord], dtype=np.int64))
 
