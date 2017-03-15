@@ -175,6 +175,10 @@ class Point:
         other_height = self.coord[-1] // m
         return self.coord * self_height, other.coord * other_height
 
+    @staticmethod
+    def infinity(n):
+        return Point(*([0] * (n + 1)), homogeneous=True)
+
 
 def dist2(p: Point, q: Point):
     coord__sum = np.square((p - q).coord[:-1]).sum()

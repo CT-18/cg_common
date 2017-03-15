@@ -1,5 +1,6 @@
 import numpy as np
 from cg import Point, turn
+from cg.utils import look_back
 from typing import List, Iterator
 from operator import methodcaller
 
@@ -12,6 +13,12 @@ class Vertex:
     def __eq__(self, other):
         return self.geometry == other.geometry
 
+    def __str__(self):
+        return str(self.geometry)
+
+    def is_finite(self):
+        return self.geometry.is_finite()
+
 
 class Face:
     def __init__(self, vertices: List[Vertex], neighbours: List['Face']):
@@ -21,7 +28,7 @@ class Face:
     def rest(self, point: Vertex):
         for i in range(3):
             if self.vertices[i] == point:
-                return self.vertices[Face.cw(i)], self.vertices[Face.ccw(i)]
+                return self.vertices[Face.ccw(i)], self.vertices[Face.cw(i)]
 
     @staticmethod
     def cw(i):
@@ -43,7 +50,7 @@ class Face:
 
     def step(self, point: Vertex, dir):
         i = 0
-        while point != self.neighbours[i]:
+        while point != self.vertices[i]:
             i += 1
         return self.neighbours[dir(i)]
 
@@ -68,38 +75,37 @@ def walk_around(point: Vertex) -> Iterator[Face]:
         nxt_ = nxt_.nxt(point)
 
 
-def walk_along(p: Vertex, q: Vertex) -> Iterator:
+def walk_along(p: Vertex, q: Point) -> Iterator:
     is_last_point = True
     intersected = p
     while True:
-        yield intersected
         if is_last_point:
-            for face in walk_around(intersected):
-                yield face
-                a, b = face.rest(intersected)
-                fst = turn(intersected, q, a)
-                snd = turn(intersected, q, b)
-                if fst == 0 or snd == 0:
-                    is_last_point = True
-                    if fst:
-                        intersected = a
-                    else:
-                        intersected = b
-                elif fst != snd:
-                    is_last_point = False
-                    intersected = face.neighbours[face[intersected]]
+            prev = -2
+            for prev_face, curr_face in look_back(walk_around(intersected)):
+                a, _ = curr_face.rest(intersected)
+                curr = turn(intersected.geometry, q, a.geometry)
+                if curr != prev:
+                    if curr >= 0:
+                        is_last_point = curr == 0
+                        intersected = prev_face
+                        break
+                prev = curr
         else:
+            yield intersected
             if not all(map(methodcaller('is_finite'), intersected.vertices)):
                 break
-            turns = [turn(p, q, vertex) for vertex in intersected.vertices]
+            turns = [turn(p.geometry, q, vertex.geometry) for vertex in intersected.vertices]
             for i in range(3):
-                if turns[i] == 0:
+                if turns[i] == 0 and p != intersected.vertices[i]:
                     intersected = intersected.vertices[i]
                     is_last_point = True
+                    i -= 1
                     break
-            else:
+            if i < 2:
                 continue
             for i in range(3):
-                if turns[i] != turns[Face.ccw(i)]:
+                if p == intersected.vertices[i]:
+                    continue
+                if turns[i] != turns[Face.ccw(i)] and turns[Face.ccw(i)] == 1:
                     intersected = intersected.neighbours[Face.cw(i)]
                     break

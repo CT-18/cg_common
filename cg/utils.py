@@ -1,5 +1,12 @@
 from functools import reduce
 import numpy as np
+from itertools import tee, islice, chain
+
+
+def look_back(some_iterable):
+    prevs, items = tee(some_iterable, 2)
+    prevs = chain([None], prevs)
+    return zip(prevs, items)
 
 
 def gcd(a: int, b: int) -> int:
