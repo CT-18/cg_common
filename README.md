@@ -6,5 +6,4 @@ common classes in computational geometry notebooks
 [![Code Climate](https://codeclimate.com/github/CT-18/cg_common/badges/gpa.svg)](https://codeclimate.com/github/CT-18/cg_common)
 
 ## How to install
-    $ pip install -r requirements.txt
-    $ python setup.py install
+    pip3 install git+https://github.com/CT-18/cg_common
