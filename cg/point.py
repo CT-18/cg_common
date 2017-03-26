@@ -134,6 +134,18 @@ class Point:
         """
         return hash(tuple(self.coord))
 
+    @property
+    def x(self):
+        return self[0]
+
+    @property
+    def y(self):
+        return self[1]
+
+    @property
+    def z(self):
+        return self[2]
+
     def is_finite(self):
         """
         предикат который возвращает True тогда и только тогда когда
@@ -163,9 +175,18 @@ class Point:
         other_height = self.coord[-1] // m
         return self.coord * self_height, other.coord * other_height
 
+    @staticmethod
+    def infinity(n):
+        return Point(*([0] * (n + 1)), homogeneous=True)
+
+
+def dist2(p: Point, q: Point):
+    coord__sum = np.square((p - q).coord[:-1]).sum()
+    return coord__sum
+
 
 def vol(point: Point, *hyperplane):
-    return det(np.array([pt.coord for pt in hyperplane] + [point.coord], dtype=np.int32))
+    return det(np.array([pt.coord for pt in hyperplane] + [point.coord], dtype=np.int64))
 
 
 def turn(point: Point, *hyperplane):
@@ -191,7 +212,7 @@ class PointSet:
         :param initial: одно из трех: число (int), np.ndarray, список Point
         """
         if isinstance(initial, int):
-            self.points = np.array([], dtype=np.int32).reshape((-1, initial + 1))
+            self.points = np.array([], dtype=np.int64).reshape((-1, initial + 1))
             self.size = 0
         elif isinstance(initial, np.ndarray):
             assert len(initial.shape) == 2 and (initial.dtype == np.int32 or initial.dtype == np.int64)
@@ -264,7 +285,7 @@ class PointSet:
         :param point: Point
         :return: None
         """
-        if point.dim() != self.dim() and point.coord.dtype == np.int32:
+        if point.dim() != self.dim() and (point.coord.dtype == np.int32 or point.coord.dtype == np.int32):
             raise Exception('incorrect point')
         self.points[item] = point.coord
 
@@ -397,7 +418,7 @@ class PointSet:
         srt = sorted(points, key=cmp_to_key(cmp_))
         points = [point.coord for point in srt]
         if inplace:
-            self.points = np.array(points, dtype=np.int32)
+            self.points = np.array(points, dtype=np.int64)
         else:
             return PointSet(points)
 
@@ -469,9 +490,9 @@ class DynamicPointSet(PointSet):
         last = Point(self.points[self.size - 1], homogeneous=True)
         self.size -= 1
         if self.size == 0:
-            self.points = np.array([], dtype=np.int32).reshape((-1, self.dim() + 1))
+            self.points = np.array([], dtype=np.int64).reshape((-1, self.dim() + 1))
         else:
-            self.points[self.size] = np.zeros(self.dim() + 1, dtype=np.int32)
+            self.points[self.size] = np.zeros(self.dim() + 1, dtype=np.int64)
         if self.size * 2 == len(self.points):
             self.points = self.points[:self.size]
         return last
@@ -500,3 +521,4 @@ class DynamicPointSet(PointSet):
         self.points[index:self.size - 1] = self.points[index + 1:self.size]
         self.pop()
         return deleted
+

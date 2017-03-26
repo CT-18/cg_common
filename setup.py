@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='cg',
-      version='0.1',
+      version='0.3',
       description='common tools for computational geometry notebooks',
       author='Artem Zholus',
       author_email='artem.zholus@gmail.com',

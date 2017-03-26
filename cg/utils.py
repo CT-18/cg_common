@@ -1,5 +1,12 @@
 from functools import reduce
 import numpy as np
+from itertools import tee, islice, chain
+
+
+def look_back(some_iterable):
+    prevs, items = tee(some_iterable, 2)
+    prevs = chain([None], prevs)
+    return zip(prevs, items)
 
 
 def gcd(a: int, b: int) -> int:
@@ -29,6 +36,13 @@ def int_det(A: np.ndarray) -> int:
     mult = 1
     for i in range(len(A) - 1):
         for j in range(i + 1, len(A)):
+            if A[i][i] == 0:
+                for k in range(i + 1, len(A)):
+                    if A[k][i] != 0:
+                        t = np.array(A[k])
+                        A[k] = A[i]
+                        A[i] = t
+                        break
             A[j] = A[j] * A[i][i] - A[i] * A[j][i]
             mult *= A[i][i]
     if mult == 0:
