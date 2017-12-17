@@ -34,7 +34,8 @@ def int_det(A: np.ndarray) -> int:
     :return: определитель A
     """
     mult = 1
-    for i in range(len(A) - 1):
+    sign = 1
+    for i in range(len(A)):
         for j in range(i + 1, len(A)):
             if A[i][i] == 0:
                 for k in range(i + 1, len(A)):
@@ -42,12 +43,13 @@ def int_det(A: np.ndarray) -> int:
                         t = np.array(A[k])
                         A[k] = A[i]
                         A[i] = t
+                        sign *= -1
                         break
             A[j] = A[j] * A[i][i] - A[i] * A[j][i]
             mult *= A[i][i]
     if mult == 0:
         mult = 1
-    return int(A.diagonal().prod()) // mult
+    return sign * int(A.diagonal().prod()) // mult
 
 
 def cmp_(x, y) -> int:
